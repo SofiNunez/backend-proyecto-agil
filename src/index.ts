@@ -1,11 +1,8 @@
-import express, { Request, Response } from 'express';
+import express from 'express';
 
 const app = express();
 
 app.use(express.json());
-
-app.get('/', (req: Request, res: Response) => {
-  res.json({ mensaje: 'Hola mundo!' });
-});
+app.use('/api');
 
 app.listen(3000, () => console.log('Servidor en http://localhost:3000'));
