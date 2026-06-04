@@ -1,0 +1,6 @@
+{
+  "sms": {
+    "activeProvider": "twilio",
+    "maxRetries": 3
+  }
+}
