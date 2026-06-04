@@ -2,11 +2,10 @@ import { EmailChannel } from './channels/email/email.channel';
 import { TrackingService } from '../tracking/service';
 import { SendNotificationDto } from './notifications.types';
 import { InitTrackingDto } from '../tracking/tracking.types';
-import { v4 as uuidv4 } from 'uuid'; // Para generar IDs únicos de notificación
+import { v4 as uuidv4 } from 'uuid';
 
 export class NotificationsService {
   private static instance: NotificationsService;
-
   private emailChannel: EmailChannel;
   private trackingService: TrackingService;
 
@@ -23,6 +22,8 @@ export class NotificationsService {
   }
 
   async sendNotification(dto: SendNotificationDto) {
+    const notificationId = uuidv4();
+
     if (dto.channel === 'email') {
       const result = await this.emailChannel.send({
         to: dto.recipient,
@@ -31,7 +32,7 @@ export class NotificationsService {
       });
 
       const trackingDto: InitTrackingDto = {
-        notificationId: dto.id ?? uuidv4(),
+        notificationId,
         channel: 'email',
         provider: result.provider,
         providerMessageId: result.messageId,
@@ -43,8 +44,9 @@ export class NotificationsService {
 
       this.trackingService.initTracking(trackingDto);
 
-      return result;
+      return { notificationId, ...result };
     }
+
     // ... otros canales (SMS, push)
   }
 }
