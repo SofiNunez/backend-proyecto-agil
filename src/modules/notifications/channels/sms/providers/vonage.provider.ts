@@ -1,6 +1,5 @@
 import { Vonage } from '@vonage/server-sdk'
-import { ISMSProvider } from './sms-provider.interface'
-import { SMSPayload, SMSResult } from '../../sms/sms.types'
+import { ISMSProvider, SMSPayload, SMSResult } from './sms-provider.interface'
 
 export class VonageProvider implements ISMSProvider {
   readonly name = 'vonage'

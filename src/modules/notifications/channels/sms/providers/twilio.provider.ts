@@ -1,6 +1,5 @@
 import twilio from 'twilio'
-import { ISMSProvider } from './sms-provider.interface'
-import { SMSPayload, SMSResult } from '../../sms/sms.types'
+import { ISMSProvider, SMSPayload, SMSResult } from './sms-provider.interface'
 
 export class TwilioProvider implements ISMSProvider {
   readonly name = 'twilio'

@@ -1,5 +1,4 @@
-import { ISMSProvider } from './providers/sms-provider.interface'
-import { SMSPayload, SMSResult } from './sms.types'
+import { ISMSProvider, SMSPayload, SMSResult } from './providers/sms-provider.interface'
 import { TwilioProvider } from './providers/twilio.provider'
 import { VonageProvider } from './providers/vonage.provider'
 import config from '../../../../../config.json'
