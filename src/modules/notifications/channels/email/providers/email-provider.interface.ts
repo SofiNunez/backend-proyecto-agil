@@ -1,4 +1,3 @@
-
 export interface EmailPayload {
   to: string | string[];
   subject: string;

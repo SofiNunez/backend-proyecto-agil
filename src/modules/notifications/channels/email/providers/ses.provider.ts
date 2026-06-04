@@ -1,4 +1,3 @@
-// src/modules/notifications/channels/email/providers/ses.provider.ts
 import { SESClient, SendEmailCommand } from '@aws-sdk/client-ses';
 import { IEmailProvider, EmailPayload, EmailResult } from './email-provider.interface';
 
