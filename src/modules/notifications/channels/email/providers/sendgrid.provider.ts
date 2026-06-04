@@ -1,12 +1,14 @@
 import sgMail from '@sendgrid/mail';
-import { IEmailProvider, EmailPayload, EmailResult } from './email-provider.interface';
+import { IEmailProvider, EmailPayload, EmailResult } from '../email.types';
 
 export class SendGridEmailProvider implements IEmailProvider {
   readonly name = 'sendgrid';
-  readonly priority = 2; // fallback
+  readonly priority = 3;
 
   constructor() {
-    sgMail.setApiKey(process.env.SENDGRID_API_KEY!);
+    if (process.env.SENDGRID_API_KEY) {
+      sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+    }
   }
 
   async send(payload: EmailPayload): Promise<EmailResult> {
@@ -23,9 +25,10 @@ export class SendGridEmailProvider implements IEmailProvider {
         success: true,
         messageId: response.headers['x-message-id'] as string,
         provider: this.name,
+        attempts: 1,
       };
     } catch (error: any) {
-      return { success: false, provider: this.name, error: error.message };
+      return { success: false, provider: this.name, error: error.message, attempts: 1 };
     }
   }
 

@@ -1,4 +1,4 @@
-import { IEmailProvider, EmailPayload, EmailResult } from './providers/email-provider.interface';
+import { IEmailProvider, EmailPayload, EmailResult } from '../email/email.types';
 import { SESEmailProvider } from './providers/ses.provider';
 import { SendGridEmailProvider } from './providers/sendgrid.provider';
 

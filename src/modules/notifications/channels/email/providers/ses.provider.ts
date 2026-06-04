@@ -1,9 +1,9 @@
 import { SESClient, SendEmailCommand } from '@aws-sdk/client-ses';
-import { IEmailProvider, EmailPayload, EmailResult } from './email-provider.interface';
+import { IEmailProvider, EmailPayload, EmailResult } from '../email.types';
 
 export class SESEmailProvider implements IEmailProvider {
   readonly name = 'amazon-ses';
-  readonly priority = 1; // proveedor principal
+  readonly priority = 2;
 
   private client: SESClient;
 
@@ -22,7 +22,7 @@ export class SESEmailProvider implements IEmailProvider {
       const command = new SendEmailCommand({
         Source: payload.from || process.env.EMAIL_FROM!,
         Destination: {
-          ToAddresses: Array.isArray(payload.to) ? payload.to : [payload.to],
+          ToAddresses: [payload.to],
         },
         Message: {
           Subject: { Data: payload.subject, Charset: 'UTF-8' },
@@ -38,9 +38,10 @@ export class SESEmailProvider implements IEmailProvider {
         success: true,
         messageId: response.MessageId,
         provider: this.name,
+        attempts: 1,
       };
     } catch (error: any) {
-      return { success: false, provider: this.name, error: error.message };
+      return { success: false, provider: this.name, error: error.message, attempts: 1 };
     }
   }
 
