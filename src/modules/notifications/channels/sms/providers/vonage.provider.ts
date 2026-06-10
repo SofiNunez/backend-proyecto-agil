@@ -1,5 +1,5 @@
 import { Vonage } from '@vonage/server-sdk'
-import { ISMSProvider, SMSPayload, SMSResult } from './sms-provider.interface'
+import { ISMSProvider, SMSPayload, SMSResult } from '../sms.types'
 
 export class VonageProvider implements ISMSProvider {
   readonly name = 'vonage'
@@ -15,7 +15,7 @@ export class VonageProvider implements ISMSProvider {
 
   async isHealthy(): Promise<boolean> {
     try {
-      await this.client.accounts.getBalance()
+      await this.client.account.getBalance()
       return true
     } catch {
       return false
@@ -24,7 +24,7 @@ export class VonageProvider implements ISMSProvider {
 
   async send(payload: SMSPayload): Promise<SMSResult> {
     try {
-      const result = await this.client.sms.send({
+      const resultado = await this.client.sms.send({
         to: payload.to,
         from: process.env.VONAGE_PHONE_NUMBER!,
         text: payload.message
@@ -32,13 +32,15 @@ export class VonageProvider implements ISMSProvider {
       return {
         success: true,
         provider: this.name,
-        messageId: result.messages[0]['message-id']
+        messageId: resultado.messages[0]['message-id'],
+        attempts: 1
       }
     } catch (error: any) {
       return {
         success: false,
         provider: this.name,
-        error: error.message
+        error: error.message,
+        attempts: 1
       }
     }
   }

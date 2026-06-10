@@ -1,5 +1,5 @@
 import twilio from 'twilio'
-import { ISMSProvider, SMSPayload, SMSResult } from './sms-provider.interface'
+import { ISMSProvider, SMSPayload, SMSResult } from '../sms.types'
 
 export class TwilioProvider implements ISMSProvider {
   readonly name = 'twilio'
@@ -24,7 +24,7 @@ export class TwilioProvider implements ISMSProvider {
 
   async send(payload: SMSPayload): Promise<SMSResult> {
     try {
-      const result = await this.client.messages.create({
+      const resultado = await this.client.messages.create({
         body: payload.message,
         from: process.env.TWILIO_PHONE_NUMBER,
         to: payload.to
@@ -32,13 +32,15 @@ export class TwilioProvider implements ISMSProvider {
       return {
         success: true,
         provider: this.name,
-        messageId: result.sid
+        messageId: resultado.sid,
+        attempts: 1
       }
     } catch (error: any) {
       return {
         success: false,
         provider: this.name,
-        error: error.message
+        error: error.message,
+        attempts: 1
       }
     }
   }
