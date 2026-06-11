@@ -28,42 +28,66 @@ export class NotificationsService {
     const notificationId = uuidv4();
 
     if (dto.channel === 'email') {
-      const result = await this.emailChannel.send({
+      const resultado = await this.emailChannel.send({
         to: dto.recipient.email,
         subject: dto.subject,
         html: dto.body.email,
       });
-      const trackingDto: InitTrackingDto = {
-        notificationId,
-        channel: 'email',
-        provider: result.provider,
-        providerMessageId: result.messageId,
-        recipient: dto.recipient.email,
-        attempts: result.attempts,
-        success: result.success,
-        error: result.error,
-      };
-      this.trackingService.initTracking(trackingDto);
-      return { notificationId, ...result };
-    }
 
-    if (dto.channel === 'sms') {
-      const result = await this.smsChannel.send({
+      // Si email fue exitoso
+      if (resultado.success) {
+        this.trackingService.initTracking({
+          notificationId,
+          channel: 'email',
+          provider: resultado.provider,
+          providerMessageId: resultado.messageId,
+          recipient: dto.recipient.email,
+          attempts: resultado.attempts,
+          success: true,
+          error: resultado.error,
+        });
+        return { notificationId, fallback_activado: false, ...resultado };
+      }
+
+      // Email falló, activar fallback a SMS
+      console.warn('[NotificationsService] Email falló, activando fallback a SMS');
+      const resultadoSMS = await this.smsChannel.send({
         to: dto.recipient.telefono,
         message: dto.body.sms,
       });
-      const trackingDto: InitTrackingDto = {
+
+      this.trackingService.initTracking({
         notificationId,
         channel: 'sms',
-        provider: result.provider,
-        providerMessageId: result.messageId,
+        provider: resultadoSMS.provider,
+        providerMessageId: resultadoSMS.messageId,
         recipient: dto.recipient.telefono,
-        attempts: result.attempts,
-        success: result.success,
-        error: result.error,
-      };
-      this.trackingService.initTracking(trackingDto);
-      return { notificationId, ...result };
+        attempts: resultado.attempts + resultadoSMS.attempts,
+        success: resultadoSMS.success,
+        error: resultadoSMS.error,
+      });
+
+      return { notificationId, fallback_activado: true, ...resultadoSMS };
+    }
+
+    if (dto.channel === 'sms') {
+      const resultado = await this.smsChannel.send({
+        to: dto.recipient.telefono,
+        message: dto.body.sms,
+      });
+
+      this.trackingService.initTracking({
+        notificationId,
+        channel: 'sms',
+        provider: resultado.provider,
+        providerMessageId: resultado.messageId,
+        recipient: dto.recipient.telefono,
+        attempts: resultado.attempts,
+        success: resultado.success,
+        error: resultado.error,
+      });
+
+      return { notificationId, fallback_activado: false, ...resultado };
     }
 
     // push -> agregar cuando esté listo
