@@ -15,7 +15,7 @@ export class VonageProvider implements ISMSProvider {
 
   async isHealthy(): Promise<boolean> {
     try {
-      await this.client.account.getBalance()
+      await this.client.accounts.getBalance()
       return true
     } catch {
       return false
