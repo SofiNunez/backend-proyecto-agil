@@ -1,4 +1,4 @@
-import { v4 as uuidv4 } from 'uuid'; // Para generar IDs únicos de notificación
+import { v4 as uuidv4 } from 'uuid';
 import { TrackingRepository } from './tracking.repository';
 import { TrackingRecord, NotificationStatus, InitTrackingDto } from './tracking.types';
 
@@ -20,7 +20,6 @@ export class TrackingService {
   initTracking(params: InitTrackingDto): TrackingRecord {
     const now = new Date();
     const initialStatus: NotificationStatus = params.success ? 'sent' : 'failed';
-
     const record: TrackingRecord = {
       id: uuidv4(),
       notificationId: params.notificationId,
@@ -37,7 +36,6 @@ export class TrackingService {
         { status: initialStatus, timestamp: now, reason: params.error },
       ],
     };
-
     this.repo.save(record);
     return record;
   }
@@ -48,14 +46,12 @@ export class TrackingService {
       console.warn(`[Tracking] No record found for providerMessageId: ${providerMessageId}`);
       return;
     }
-
     const status = this.normalizeStatus(rawStatus);
     this.repo.updateStatus(record.notificationId, {
       status,
       timestamp: new Date(),
       reason,
     });
-
     console.log(`[Tracking] ${record.notificationId} → ${status}`);
   }
 
@@ -66,14 +62,20 @@ export class TrackingService {
   private normalizeStatus(raw: string): NotificationStatus {
     const map: Record<string, NotificationStatus> = {
       // Amazon SES
-      'Delivery':  'delivered',
-      'Bounce':    'failed',
-      'Complaint': 'failed',
+      'Delivery':    'delivered',
+      'Bounce':      'failed',
+      'Complaint':   'failed',
       // SendGrid
-      'delivered': 'delivered',
-      'bounce':    'failed',
-      'blocked':   'failed',
-      'dropped':   'failed',
+      'delivered':   'delivered',
+      'bounce':      'failed',
+      'blocked':     'failed',
+      'dropped':     'failed',
+      // Twilio
+      'failed':      'failed',
+      'undelivered': 'failed',
+      'sent':        'sent',
+      // Vonage
+      'rejected':    'failed',
     };
     return map[raw] ?? 'sent';
   }
