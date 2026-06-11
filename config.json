@@ -2,14 +2,5 @@
   "sms": {
     "activeProvider": "vonage",
     "maxRetries": 3
-  },
-  "apiKeys": [
-    { "id": 1, "name": "Proyecto 1 - Salud domiciliaria", "key": "4uaAfZTtCtETT8xlxcQrbZKT1SKRqGYe", "active": true, "rate_limit_per_minute": 100 },
-    { "id": 3, "name": "Proyecto 3 - Pedidos omnicanal", "key": "7KpQmXvRnB2sYwZ9eHtJdF5gCuA3LiN8", "active": true, "rate_limit_per_minute": 100 },
-    { "id": 4, "name": "Proyecto 4 - Pagos", "key": "9RtUwPxMoK6hVbQ1cSjYnE4fDzA7GiL2", "active": true, "rate_limit_per_minute": 100 },
-    { "id": 5, "name": "Proyecto 5 - Inventario", "key": "2NqBvZyXpJ8mWkR5tHsUdC3eAoF6LiG4", "active": true, "rate_limit_per_minute": 100 },
-    { "id": 8, "name": "Proyecto 8 - IoT", "key": "5MwKpRnXvB9qYtZ2eHsJdF7gCuA4LiN1", "active": true, "rate_limit_per_minute": 100 },
-    { "id": 10, "name": "Proyecto 10 - Suscripciones", "key": "8PtUwQxMoK3hVbR6cSjYnE1fDzA9GiL5", "active": true, "rate_limit_per_minute": 100 },
-    { "id": 11, "name": "Proyecto 11 - Incidentes", "key": "6KqBvZyXpJ5mWkR8tHsUdC2eAoF3LiG7", "active": true, "rate_limit_per_minute": 100 }
-  ]
+  }
 }
