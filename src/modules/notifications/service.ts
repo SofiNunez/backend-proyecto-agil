@@ -34,6 +34,7 @@ export class NotificationsService {
         html: dto.body.email,
       });
 
+      // Si email fue exitoso
       if (resultado.success) {
         this.trackingService.initTracking({
           notificationId,
@@ -48,21 +49,7 @@ export class NotificationsService {
         return { notificationId, fallback_activado: false, ...resultado };
       }
 
-      if (!dto.recipient.telefono) {
-        console.warn('[NotificationsService] Email falló y no hay teléfono para fallback');
-        this.trackingService.initTracking({
-          notificationId,
-          channel: 'email',
-          provider: resultado.provider,
-          providerMessageId: resultado.messageId,
-          recipient: dto.recipient.email,
-          attempts: resultado.attempts,
-          success: false,
-          error: 'Email falló y no hay teléfono disponible para fallback',
-        });
-        return { notificationId, fallback_activado: false, ...resultado };
-      }
-
+      // Email falló, activar fallback a SMS
       console.warn('[NotificationsService] Email falló, activando fallback a SMS');
       const resultadoSMS = await this.smsChannel.send({
         to: dto.recipient.telefono,

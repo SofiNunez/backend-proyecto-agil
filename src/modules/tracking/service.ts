@@ -61,18 +61,22 @@ export class TrackingService {
 
   private normalizeStatus(raw: string): NotificationStatus {
     const map: Record<string, NotificationStatus> = {
+      // Amazon SES
       'Delivery':    'delivered',
       'Bounce':      'failed',
       'Complaint':   'failed',
+      // SendGrid
       'delivered':   'delivered',
       'bounce':      'failed',
       'blocked':     'failed',
       'dropped':     'failed',
+      // Twilio
       'failed':      'failed',
       'undelivered': 'failed',
       'sent':        'sent',
+      // Vonage
       'rejected':    'failed',
     };
-    return map[raw] ?? 'pending';
+    return map[raw] ?? 'sent';
   }
 }
