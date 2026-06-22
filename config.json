@@ -1,4 +1,8 @@
 {
+  "email": {
+    "activeProvider": "sendgrid",
+    "maxRetries": 3
+  },
   "sms": {
     "activeProvider": "vonage",
     "maxRetries": 3

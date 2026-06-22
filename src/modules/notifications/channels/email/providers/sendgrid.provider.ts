@@ -3,7 +3,7 @@ import { IEmailProvider, EmailPayload, EmailResult } from '../email.types';
 
 export class SendGridEmailProvider implements IEmailProvider {
   readonly name = 'sendgrid';
-  readonly priority = 3;
+  readonly priority = 1;
 
   constructor() {
     if (process.env.SENDGRID_API_KEY) {
