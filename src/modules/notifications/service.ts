@@ -4,7 +4,7 @@ import { SMSChannel } from './channels/sms/sms.channel';
 import { PushChannel } from './channels/push/push.channel';
 import { TrackingService } from '../tracking/service';
 import { SendNotificationDto } from './notifications.types';
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from 'uuid'; //da ids unicos para cada notificación
 
 export class NotificationsService {
   private static instance: NotificationsService;
@@ -27,8 +27,8 @@ export class NotificationsService {
     return NotificationsService.instance;
   }
 
-  async sendNotification(dto: SendNotificationDto) {
-    const notificationId = uuidv4();
+  async sendNotification(dto: SendNotificationDto & { notificationId?: string }) {
+    const notificationId = dto.notificationId ?? uuidv4();
 
     if (dto.channel === 'email') {
       const resultado = await this.emailChannel.send({
