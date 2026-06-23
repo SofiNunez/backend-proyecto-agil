@@ -6,5 +6,9 @@
   "sms": {
     "activeProvider": "vonage",
     "maxRetries": 3
+  },
+  "push": {
+    "activeProvider": "fcm",
+    "maxRetries": 3
   }
 }
