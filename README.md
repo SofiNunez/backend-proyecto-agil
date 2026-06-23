@@ -207,8 +207,7 @@ El sistema reintenta automáticamente hasta 3 veces con backoff exponencial ante
 
 - Cada proyecto tiene su propia API Key
 - Rate limiting: máximo **20 requests por minuto** por IP
-- Cola con backpressure: máximo **100 jobs** en cola simultáneamente
-- Los datos sensibles (email, teléfono) nunca se loguean en texto plano
+- Cola con backpressure: máximo **1000 jobs** en cola simultáneamente
 
 ---
 
