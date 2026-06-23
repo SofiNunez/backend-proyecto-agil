@@ -1,4 +1,4 @@
-# 📬 Plataforma de Notificaciones Multicanal
+# Plataforma de Notificaciones Multicanal
 
 Servicio transversal para envío y seguimiento de notificaciones por **email**, **SMS** y **push** con alta disponibilidad, fallback automático entre proveedores y tracking de estados en tiempo real.
 
