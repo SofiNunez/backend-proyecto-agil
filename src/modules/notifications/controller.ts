@@ -1,5 +1,6 @@
 import { Router, Request, Response } from 'express';
 import { authMiddleware } from '../../middleware/auth.middleware';
+import { validateSendNotification } from '../../middleware/validate.middleware';
 import { notificationRateLimit } from '../../middleware/rate-limit.middleware';
 import { notificationQueue } from '../../queue/notification.queue';
 
@@ -8,6 +9,7 @@ const router = Router();
 router.post('/send',
   authMiddleware,
   notificationRateLimit,
+  validateSendNotification,
   async (req: Request, res: Response) => {
     try {
       const result = await notificationQueue.add(req.body);

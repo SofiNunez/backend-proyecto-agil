@@ -1,16 +1,15 @@
-// src/modules/notifications/notifications.types.ts
 export interface SendNotificationDto {
   channel: 'email' | 'sms' | 'push';
   recipient: {
-    email: string;
-    telefono: string;
-    deviceToken?: string; 
+    email?: string;
+    telefono?: string;
+    deviceToken?: string;
   };
-  subject: string;
+  subject?: string;
   body: {
-    email: string;
-    sms: string;
-    push?: {               
+    email?: string;
+    sms?: string;
+    push?: {
       title: string;
       body: string;
     };

@@ -111,27 +111,62 @@ x-api-key: tu-api-key
 Content-Type: application/json
 ```
 
-**Body:**
+>  Cada canal tiene su propio formato de JSON. Solo incluye los campos del canal que vas a usar.
+ 
+---
+ 
+#### Canal Email
+ 
 ```json
 {
   "channel": "email",
   "recipient": {
-    "email": "destino@gmail.com",
-    "telefono": "+56912345678",
-    "deviceToken": "token-del-dispositivo"
+    "email": "destino@gmail.com"
   },
   "subject": "Asunto del mensaje",
   "body": {
-    "email": "<h1>Hola!</h1><p>Este es el mensaje</p>",
-    "sms": "Este es el mensaje por SMS",
+    "email": "<h1>Hola!</h1><p>Este es el mensaje</p>"
+  }
+}
+```
+
+---
+ 
+#### Canal SMS
+ 
+```json
+{
+  "channel": "sms",
+  "recipient": {
+    "telefono": "+56912345678"
+  },
+  "body": {
+    "sms": "Este es el mensaje por SMS"
+  }
+}
+```
+
+---
+ 
+#### Canal Push
+ 
+```json
+{
+  "channel": "push",
+  "recipient": {
+    "deviceToken": "token-del-dispositivo"
+  },
+  "body": {
     "push": {
       "title": "Título de la notificación",
-      "body": "Cuerpo de la notificación"
+      "body": "Cuerpo del mensaje"
     }
   }
 }
 ```
 
+---
+ 
 **Respuesta exitosa (`202`):**
 ```json
 {
@@ -141,7 +176,16 @@ Content-Type: application/json
   "tracking": "/tracking/uuid-de-la-notificacion"
 }
 ```
-
+ 
+**Respuestas de error:**
+ 
+| Código | Descripción |
+|---|---|
+| `400` | Campos requeridos faltantes o inválidos |
+| `401` | API Key inválida o no enviada |
+| `429` | Sistema sobrecargado o rate limit alcanzado |
+| `500` | Error interno del servidor |
+ 
 ---
 
 ### Consultar estado de una notificación
