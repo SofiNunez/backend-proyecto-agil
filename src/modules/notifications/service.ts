@@ -3,6 +3,7 @@ import { SMSChannel } from './channels/sms/sms.channel';
 import { PushChannel } from './channels/push/push.channel';
 import { TrackingService } from '../tracking/service';
 import { SendNotificationDto } from './notifications.types';
+import { AnalyticsService } from './analytics.service';
 import { v4 as uuidv4 } from 'uuid';
 
 export class NotificationsService {
@@ -47,10 +48,15 @@ export class NotificationsService {
           success: true,
           error: resultado.error,
         });
+        // Avisa al Grupo 9
+        AnalyticsService.notificacionEnviada(notificationId, 'email', resultado.attempts);
         return { notificationId, fallback_activado: false, ...resultado };
       }
 
       console.warn('[NotificationsService] Email falló, activando fallback a SMS');
+      // Avisa al Grupo 9 que se activó fallback
+      AnalyticsService.fallbackActivado(notificationId, 'sms');
+
       const resultadoSMS = await this.smsChannel.send({
         to: dto.recipient.telefono!,
         message: dto.body.sms!,
@@ -66,6 +72,12 @@ export class NotificationsService {
         success: resultadoSMS.success,
         error: resultadoSMS.error,
       });
+
+      if (resultadoSMS.success) {
+        AnalyticsService.notificacionEnviada(notificationId, 'sms', resultado.attempts + resultadoSMS.attempts);
+      } else {
+        AnalyticsService.notificacionFallida(notificationId, 'sms', resultado.attempts + resultadoSMS.attempts);
+      }
 
       return { notificationId, fallback_activado: true, ...resultadoSMS };
     }
@@ -86,6 +98,12 @@ export class NotificationsService {
         success: resultado.success,
         error: resultado.error,
       });
+
+      if (resultado.success) {
+        AnalyticsService.notificacionEnviada(notificationId, 'sms', resultado.attempts);
+      } else {
+        AnalyticsService.notificacionFallida(notificationId, 'sms', resultado.attempts);
+      }
 
       return { notificationId, fallback_activado: false, ...resultado };
     }
@@ -108,10 +126,13 @@ export class NotificationsService {
           success: true,
           error: resultado.error,
         });
+        AnalyticsService.notificacionEnviada(notificationId, 'push', resultado.attempts);
         return { notificationId, fallback_activado: false, ...resultado };
       }
 
       console.warn('[NotificationsService] Push falló, activando fallback a email');
+      AnalyticsService.fallbackActivado(notificationId, 'email');
+
       const resultadoEmail = await this.emailChannel.send({
         to: dto.recipient.email!,
         subject: dto.subject ?? '',
@@ -128,6 +149,12 @@ export class NotificationsService {
         success: resultadoEmail.success,
         error: resultadoEmail.error,
       });
+
+      if (resultadoEmail.success) {
+        AnalyticsService.notificacionEnviada(notificationId, 'email', resultado.attempts + resultadoEmail.attempts);
+      } else {
+        AnalyticsService.notificacionFallida(notificationId, 'email', resultado.attempts + resultadoEmail.attempts);
+      }
 
       return { notificationId, fallback_activado: true, ...resultadoEmail };
     }
