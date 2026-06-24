@@ -170,10 +170,9 @@ Content-Type: application/json
 **Respuesta exitosa (`202`):**
 ```json
 {
-  "jobId": "uuid-del-job",
-  "notificationId": "uuid-de-la-notificacion",
+  "jobId": "Id del job",
+  "notificationId": "Id notificación",
   "message": "Notificación en cola",
-  "tracking": "/tracking/uuid-de-la-notificacion"
 }
 ```
  
@@ -202,7 +201,7 @@ x-api-key: tu-api-key
 **Respuesta:**
 ```json
 {
-  "notificationId": "uuid-de-la-notificacion",
+  "notificationId": "ID de la notificación",
   "channel": "email",
   "provider": "sendgrid",
   "status": "sent",
