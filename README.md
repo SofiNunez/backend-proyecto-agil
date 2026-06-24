@@ -38,7 +38,8 @@ src/
 ├── index.ts
 ├── middleware/
 │   ├── auth.middleware.ts
-│   └── rate-limit.middleware.ts
+│   ├── rate-limit.middleware.ts
+│   └── validate.middleware.ts
 ├── queue/
 │   └── notification.queue.ts
 └── modules/
