@@ -1,10 +1,9 @@
-import { InitTrackingDto } from '../tracking/tracking.types';
 import { EmailChannel } from './channels/email/email.channel';
 import { SMSChannel } from './channels/sms/sms.channel';
 import { PushChannel } from './channels/push/push.channel';
 import { TrackingService } from '../tracking/service';
 import { SendNotificationDto } from './notifications.types';
-import { v4 as uuidv4 } from 'uuid'; //da ids unicos para cada notificación
+import { v4 as uuidv4 } from 'uuid';
 
 export class NotificationsService {
   private static instance: NotificationsService;
@@ -32,9 +31,9 @@ export class NotificationsService {
 
     if (dto.channel === 'email') {
       const resultado = await this.emailChannel.send({
-        to: dto.recipient.email,
-        subject: dto.subject,
-        html: dto.body.email,
+        to: dto.recipient.email!,
+        subject: dto.subject ?? '',
+        html: dto.body.email!,
       });
 
       if (resultado.success) {
@@ -43,7 +42,7 @@ export class NotificationsService {
           channel: 'email',
           provider: resultado.provider,
           providerMessageId: resultado.messageId,
-          recipient: dto.recipient.email,
+          recipient: dto.recipient.email!,
           attempts: resultado.attempts,
           success: true,
           error: resultado.error,
@@ -53,8 +52,8 @@ export class NotificationsService {
 
       console.warn('[NotificationsService] Email falló, activando fallback a SMS');
       const resultadoSMS = await this.smsChannel.send({
-        to: dto.recipient.telefono,
-        message: dto.body.sms,
+        to: dto.recipient.telefono!,
+        message: dto.body.sms!,
       });
 
       this.trackingService.initTracking({
@@ -62,7 +61,7 @@ export class NotificationsService {
         channel: 'sms',
         provider: resultadoSMS.provider,
         providerMessageId: resultadoSMS.messageId,
-        recipient: dto.recipient.telefono,
+        recipient: dto.recipient.telefono!,
         attempts: resultado.attempts + resultadoSMS.attempts,
         success: resultadoSMS.success,
         error: resultadoSMS.error,
@@ -73,8 +72,8 @@ export class NotificationsService {
 
     if (dto.channel === 'sms') {
       const resultado = await this.smsChannel.send({
-        to: dto.recipient.telefono,
-        message: dto.body.sms,
+        to: dto.recipient.telefono!,
+        message: dto.body.sms!,
       });
 
       this.trackingService.initTracking({
@@ -82,7 +81,7 @@ export class NotificationsService {
         channel: 'sms',
         provider: resultado.provider,
         providerMessageId: resultado.messageId,
-        recipient: dto.recipient.telefono,
+        recipient: dto.recipient.telefono!,
         attempts: resultado.attempts,
         success: resultado.success,
         error: resultado.error,
@@ -94,7 +93,7 @@ export class NotificationsService {
     if (dto.channel === 'push') {
       const resultado = await this.pushChannel.send({
         to: dto.recipient.deviceToken!,
-        title: dto.body.push?.title ?? dto.subject,
+        title: dto.body.push?.title ?? dto.subject ?? '',
         body: dto.body.push?.body ?? '',
       });
 
@@ -114,9 +113,9 @@ export class NotificationsService {
 
       console.warn('[NotificationsService] Push falló, activando fallback a email');
       const resultadoEmail = await this.emailChannel.send({
-        to: dto.recipient.email,
-        subject: dto.subject,
-        html: dto.body.email,
+        to: dto.recipient.email!,
+        subject: dto.subject ?? '',
+        html: dto.body.email!,
       });
 
       this.trackingService.initTracking({
@@ -124,7 +123,7 @@ export class NotificationsService {
         channel: 'email',
         provider: resultadoEmail.provider,
         providerMessageId: resultadoEmail.messageId,
-        recipient: dto.recipient.email,
+        recipient: dto.recipient.email!,
         attempts: resultado.attempts + resultadoEmail.attempts,
         success: resultadoEmail.success,
         error: resultadoEmail.error,

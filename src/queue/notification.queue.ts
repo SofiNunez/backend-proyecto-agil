@@ -73,9 +73,9 @@ class NotificationQueue {
 
   status() {
     return {
-      enCola: this.queue.length,
-      procesando: this.concurrency,
-      capacidadMaxima: this.MAX_QUEUE_SIZE,
+      inQueue: this.queue.length,
+      processing: this.concurrency,
+      maxCapacity: this.MAX_QUEUE_SIZE,
     };
   }
 }
