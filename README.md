@@ -227,9 +227,9 @@ GET /notifications/queue/status
 **Respuesta:**
 ```json
 {
-  "enCola": 3,
-  "procesando": 1,
-  "capacidadMaxima": 100
+  "inQueue": 3,
+  "processing": 1,
+  "maxCapacity": 100
 }
 ```
 
