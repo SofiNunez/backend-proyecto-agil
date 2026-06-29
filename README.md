@@ -28,6 +28,7 @@ Servicio transversal para envío y seguimiento de notificaciones por **email**, 
 | SMS | Twilio + Vonage |
 | Push | Firebase Cloud Messaging |
 | IDs únicos | UUID v4 |
+| Deployment | Railway |
 
 ---
 
