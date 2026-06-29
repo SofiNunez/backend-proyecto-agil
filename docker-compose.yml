@@ -1,0 +1,36 @@
+# docker-compose.yml
+services:
+  notifications:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      PORT: 3000
+
+      # Amazon SES
+      AWS_REGION: us-east-1
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+
+      # SendGrid
+      SENDGRID_API_KEY: ${SENDGRID_API_KEY}
+
+      # Email remitente
+      EMAIL_FROM: ${EMAIL_FROM}
+
+      # API Keys por proyecto
+      API_KEY_PROYECTO_1: ${API_KEY_PROYECTO_1}
+      API_KEY_PROYECTO_3: ${API_KEY_PROYECTO_3}
+      API_KEY_PROYECTO_4: ${API_KEY_PROYECTO_4}
+      API_KEY_PROYECTO_5: ${API_KEY_PROYECTO_5}
+      API_KEY_PROYECTO_8: ${API_KEY_PROYECTO_8}
+      API_KEY_PROYECTO_10: ${API_KEY_PROYECTO_10}
+      API_KEY_PROYECTO_11: ${API_KEY_PROYECTO_11}
+      API_KEY_TESTING: ${API_KEY_TESTING}
+
+      # Firebase Cloud Messaging
+      FIREBASE_PROJECT_ID: ${FIREBASE_PROJECT_ID}
+      FIREBASE_CLIENT_EMAIL: ${FIREBASE_CLIENT_EMAIL}
+      FIREBASE_PRIVATE_KEY: ${FIREBASE_PRIVATE_KEY}
+
+    restart: unless-stopped
