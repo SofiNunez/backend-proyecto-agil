@@ -12,13 +12,15 @@ app.set('trust proxy', 1)
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }))
 
-// Webhooks públicos sin auth
 const trackingService = TrackingService.getInstance();
 
-app.post('/webhooks/vonage', (req, res) => {
+// Webhooks públicos sin auth
+app.post('/webhooks/vonage', express.urlencoded({ extended: true }), express.json(), (req, res) => {
   console.log('[Webhook] Vonage body:', JSON.stringify(req.body))
-  const messageId = req.body['message-id'] || req.body.messageId
-  const rawStatus = req.body.status
+  console.log('[Webhook] Vonage query:', JSON.stringify(req.query))
+  const messageId = req.body['message-id'] || req.body.messageId || req.query['message-id'] as string || req.query.messageId as string
+  const rawStatus = req.body.status || req.query.status as string
+  console.log(`[Webhook] Vonage messageId: ${messageId}, status: ${rawStatus}`)
   trackingService.handleWebhookEvent(messageId, rawStatus)
   res.sendStatus(200)
 })
