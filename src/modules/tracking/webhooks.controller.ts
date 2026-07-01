@@ -1,8 +1,12 @@
 import { Router, Request, Response } from 'express';
+import express from 'express';
 import { TrackingService } from './service';
 
 const router = Router();
 const trackingService = TrackingService.getInstance();
+
+// Soporte para form-urlencoded (Vonage lo usa)
+router.use(express.urlencoded({ extended: true }))
 
 // Webhook de SendGrid
 router.post('/sendgrid', (req: Request, res: Response) => {
@@ -23,14 +27,15 @@ router.post('/sendgrid', (req: Request, res: Response) => {
 // Webhook de Vonage
 router.post('/vonage', (req: Request, res: Response) => {
   try {
-    const messageId = req.body['message-id'] || req.body.messageId;
-    const rawStatus = req.body.status;
-    console.log(`[Webhook] Vonage evento: ${rawStatus}, messageId: ${messageId}`);
-    trackingService.handleWebhookEvent(messageId, rawStatus);
-    res.sendStatus(200);
+    console.log('[Webhook] Vonage body completo:', JSON.stringify(req.body))
+    const messageId = req.body['message-id'] || req.body.messageId || req.body['messageId']
+    const rawStatus = req.body.status || req.body['status']
+    console.log(`[Webhook] Vonage evento: ${rawStatus}, messageId: ${messageId}`)
+    trackingService.handleWebhookEvent(messageId, rawStatus)
+    res.sendStatus(200)
   } catch (error) {
-    console.error('[Webhook] Error procesando Vonage:', error);
-    res.sendStatus(400);
+    console.error('[Webhook] Error procesando Vonage:', error)
+    res.sendStatus(400)
   }
 });
 
