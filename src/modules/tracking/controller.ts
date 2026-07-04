@@ -18,4 +18,19 @@ router.get('/:notificationId', authMiddleware, (req: Request, res: Response) => 
   res.json(record);
 });
 
+// Webhook de SendGrid
+router.post('/webhooks/sendgrid', (req: Request, res: Response) => {
+  const events = req.body as Array<{ sg_message_id: string; event: string; reason?: string }>;
+
+  for (const ev of events) {
+    const messageId = Array.isArray(ev.sg_message_id)
+      ? ev.sg_message_id[0]
+      : ev.sg_message_id?.split('.')[0];
+
+    trackingService.handleWebhookEvent(messageId, ev.event, ev.reason);
+  }
+
+  res.sendStatus(200);
+});
+
 export default router;
