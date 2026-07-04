@@ -12,7 +12,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }))
 
 app.use('/notifications', authMiddleware, notificationsRouter);
-app.use('/tracking', authMiddleware, trackingRouter);
+app.use('/tracking', trackingRouter);
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
