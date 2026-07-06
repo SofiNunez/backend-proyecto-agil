@@ -33,12 +33,24 @@ router.post('/webhooks/sendgrid', (req: Request, res: Response) => {
   res.sendStatus(200);
 });
 
-// Webhook de Vonage
+// Webhook de Vonage POST
 router.post('/webhooks/vonage', (req: Request, res: Response) => {
-  console.log('[Webhook] Vonage body:', JSON.stringify(req.body))
-  console.log('[Webhook] Vonage query:', JSON.stringify(req.query))
+  console.log('[Webhook] Vonage POST body:', JSON.stringify(req.body))
+  console.log('[Webhook] Vonage POST query:', JSON.stringify(req.query))
   const messageId = req.query['message-id'] as string || req.query.messageId as string || req.body['message-id'] || req.body.messageId
   const rawStatus = req.query.status as string || req.body.status
+  console.log(`[Webhook] Vonage messageId: ${messageId}, status: ${rawStatus}`)
+  if (messageId) {
+    trackingService.handleWebhookEvent(messageId, rawStatus)
+  }
+  res.sendStatus(200)
+});
+
+// Webhook de Vonage GET
+router.get('/webhooks/vonage', (req: Request, res: Response) => {
+  console.log('[Webhook] Vonage GET query:', JSON.stringify(req.query))
+  const messageId = req.query['message-id'] as string || req.query.messageId as string
+  const rawStatus = req.query.status as string
   console.log(`[Webhook] Vonage messageId: ${messageId}, status: ${rawStatus}`)
   if (messageId) {
     trackingService.handleWebhookEvent(messageId, rawStatus)
