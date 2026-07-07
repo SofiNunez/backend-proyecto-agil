@@ -20,20 +20,27 @@ export class TrackingService {
     return await this.repo.save(params);
   }
 
-  async handleWebhookEvent(providerMessageId: string, rawStatus: string, reason?: string): Promise<void> {
-    const record = await this.repo.findByProviderMessageId(providerMessageId);
-    if (!record) {
-      console.warn(`[Tracking] No record found for providerMessageId: ${providerMessageId}`);
-      return;
-    }
-    const status = this.normalizeStatus(rawStatus);
-    await this.repo.updateStatus(record.notificationId, {
-      status,
-      timestamp: new Date(),
-      reason,
-    });
-    console.log(`[Tracking] ${record.notificationId} → ${status}`);
+async handleWebhookEvent(providerMessageId: string, rawStatus: string, reason?: string): Promise<void> {
+  const record = await this.repo.findByProviderMessageId(providerMessageId);
+  if (!record) {
+    console.warn(`[Tracking] No record found for providerMessageId: ${providerMessageId}`);
+    return;
   }
+
+  // No actualizar si ya está en estado final
+  if (record.status === 'delivered' || record.status === 'failed') {
+    console.log(`[Tracking] Estado ya final (${record.status}), ignorando webhook`);
+    return;
+  }
+
+  const status = this.normalizeStatus(rawStatus);
+  await this.repo.updateStatus(record.notificationId, {
+    status,
+    timestamp: new Date(),
+    reason,
+  });
+  console.log(`[Tracking] ${record.notificationId} → ${status}`);
+}
 
   async getStatus(notificationId: string): Promise<TrackingRecord | undefined> {
     return await this.repo.findByNotificationId(notificationId);
