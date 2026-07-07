@@ -17,9 +17,10 @@ WORKDIR /app
 # Solo instala dependencias de producción
 COPY package*.json ./
 RUN npm ci --omit=dev
-# Copia prisma para runtime
+# Copia prisma para runtime y genera el cliente
 COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/prisma.config.ts ./prisma.config.ts
+COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 # Copia solo el build compilado
 COPY --from=builder /app/dist ./dist
 # Usuario no root por seguridad
