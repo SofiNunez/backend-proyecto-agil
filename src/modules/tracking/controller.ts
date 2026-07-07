@@ -1,6 +1,7 @@
 import { Router, Request, Response } from 'express';
 import { TrackingService } from './service';
 import { authMiddleware } from '../../middleware/auth.middleware';
+import { AnalyticsService } from '../notifications/analytics.service';
 
 const router = Router();
 const trackingService = TrackingService.getInstance();
@@ -28,6 +29,12 @@ router.post('/webhooks/sendgrid', async (req: Request, res: Response) => {
       : ev.sg_message_id?.split('.')[0];
     if (messageId) {
       await trackingService.handleWebhookEvent(messageId, ev.event, ev.reason);
+      if (ev.event === 'delivered') {
+        const record = await trackingService.getStatusByProviderMessageId(messageId)
+        if (record) {
+          await AnalyticsService.notificacionEntregada(record.notificationId, record.channel)
+        }
+      }
     }
   }
   res.sendStatus(200);
@@ -41,6 +48,13 @@ router.get('/webhooks/vonage', async (req: Request, res: Response) => {
   console.log(`[Webhook] Vonage messageId: ${messageId}, status: ${rawStatus}`)
   if (messageId) {
     await trackingService.handleWebhookEvent(messageId, rawStatus)
+    if (rawStatus === 'delivered') {
+      const record = await trackingService.getStatusByProviderMessageId(messageId)
+      if (record) {
+        await AnalyticsService.notificacionEntregada(record.notificationId, record.channel)
+        console.log(`[Analytics] notificacion_entregada enviado para ${record.notificationId}`)
+      }
+    }
   }
   res.sendStatus(200)
 });

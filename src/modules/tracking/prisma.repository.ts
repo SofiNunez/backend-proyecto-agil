@@ -1,8 +1,16 @@
 import { PrismaClient } from '@prisma/client'
+import { PrismaPg } from '@prisma/adapter-pg'
+import { Pool } from 'pg'
 import { TrackingRecord, StatusEvent, InitTrackingDto, NotificationStatus } from './tracking.types'
 import { v4 as uuidv4 } from 'uuid'
+import 'dotenv/config'
 
-const prisma = new PrismaClient()
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL
+})
+
+const adapter = new PrismaPg(pool)
+const prisma = new PrismaClient({ adapter })
 
 export class PrismaTrackingRepository {
   async save(params: InitTrackingDto): Promise<TrackingRecord> {
@@ -12,7 +20,6 @@ export class PrismaTrackingRepository {
       { status: 'pending', timestamp: now },
       { status: initialStatus, timestamp: now, reason: params.error }
     ]
-
     const record = await prisma.notification.create({
       data: {
         id: uuidv4(),
@@ -26,7 +33,6 @@ export class PrismaTrackingRepository {
         statusHistory: statusHistory as any,
       }
     })
-
     return this.toTrackingRecord(record)
   }
 
@@ -49,9 +55,7 @@ export class PrismaTrackingRepository {
       where: { notificationId }
     })
     if (!existing) return undefined
-
     const statusHistory = [...(existing.statusHistory as any[]), event]
-
     const record = await prisma.notification.update({
       where: { notificationId },
       data: {
@@ -59,7 +63,6 @@ export class PrismaTrackingRepository {
         statusHistory: statusHistory as any,
       }
     })
-
     return this.toTrackingRecord(record)
   }
 

@@ -43,7 +43,7 @@ export class TrackingService {
     return await this.repo.findByProviderMessageId(providerMessageId);
   }
 
-  private normalizeStatus(raw: string): NotificationStatus {
+private normalizeStatus(raw: string): NotificationStatus {
   const map: Record<string, NotificationStatus> = {
     // Amazon SES
     'Delivery':    'delivered',

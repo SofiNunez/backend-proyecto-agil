@@ -1,8 +1,7 @@
 import { defineConfig } from 'prisma/config'
-import 'dotenv/config'
 
 export default defineConfig({
   datasource: {
-    url: process.env.DATABASE_URL!
+    url: 'postgresql://postgres:AKgNPfZASetqKoTOIKOOkfVHNUDsJDEU@trolley.proxy.rlwy.net:48155/railway'
   }
 })
