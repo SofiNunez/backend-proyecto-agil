@@ -5,11 +5,11 @@ import { authMiddleware } from '../../middleware/auth.middleware';
 const router = Router();
 const trackingService = TrackingService.getInstance();
 
-router.get('/:notificationId', authMiddleware, (req: Request, res: Response) => {
+router.get('/:notificationId', authMiddleware, async (req: Request, res: Response) => {
   const notificationId = Array.isArray(req.params.notificationId)
     ? req.params.notificationId[0]
     : req.params.notificationId;
-  const record = trackingService.getStatus(notificationId);
+  const record = await trackingService.getStatus(notificationId);
   if (!record) {
     res.status(404).json({ message: 'Notificación no encontrada' });
     return;
@@ -18,7 +18,7 @@ router.get('/:notificationId', authMiddleware, (req: Request, res: Response) => 
 });
 
 // Webhook de SendGrid
-router.post('/webhooks/sendgrid', (req: Request, res: Response) => {
+router.post('/webhooks/sendgrid', async (req: Request, res: Response) => {
   console.log(req.body);
   const body = req.body;
   const events = Array.isArray(body) ? body : [body];
@@ -27,33 +27,20 @@ router.post('/webhooks/sendgrid', (req: Request, res: Response) => {
       ? ev.sg_message_id[0]
       : ev.sg_message_id?.split('.')[0];
     if (messageId) {
-      trackingService.handleWebhookEvent(messageId, ev.event, ev.reason);
+      await trackingService.handleWebhookEvent(messageId, ev.event, ev.reason);
     }
   }
   res.sendStatus(200);
 });
 
-// Webhook de Vonage POST
-router.post('/webhooks/vonage', (req: Request, res: Response) => {
-  console.log('[Webhook] Vonage POST body:', JSON.stringify(req.body))
-  console.log('[Webhook] Vonage POST query:', JSON.stringify(req.query))
-  const messageId = req.query['message-id'] as string || req.query.messageId as string || req.body['message-id'] || req.body.messageId
-  const rawStatus = req.query.status as string || req.body.status
-  console.log(`[Webhook] Vonage messageId: ${messageId}, status: ${rawStatus}`)
-  if (messageId) {
-    trackingService.handleWebhookEvent(messageId, rawStatus)
-  }
-  res.sendStatus(200)
-});
-
 // Webhook de Vonage GET
-router.get('/webhooks/vonage', (req: Request, res: Response) => {
+router.get('/webhooks/vonage', async (req: Request, res: Response) => {
   console.log('[Webhook] Vonage GET query:', JSON.stringify(req.query))
-  const messageId = req.query['message-id'] as string || req.query.messageId as string
+  const messageId = req.query['messageId'] as string || req.query['message-id'] as string
   const rawStatus = req.query.status as string
   console.log(`[Webhook] Vonage messageId: ${messageId}, status: ${rawStatus}`)
   if (messageId) {
-    trackingService.handleWebhookEvent(messageId, rawStatus)
+    await trackingService.handleWebhookEvent(messageId, rawStatus)
   }
   res.sendStatus(200)
 });

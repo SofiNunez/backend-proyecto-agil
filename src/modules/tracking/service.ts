@@ -1,13 +1,12 @@
-import { v4 as uuidv4 } from 'uuid';
-import { TrackingRepository } from './tracking.repository';
+import { PrismaTrackingRepository } from './prisma.repository';
 import { TrackingRecord, NotificationStatus, InitTrackingDto } from './tracking.types';
 
 export class TrackingService {
   private static instance: TrackingService;
-  private repo: TrackingRepository;
+  private repo: PrismaTrackingRepository;
 
   private constructor() {
-    this.repo = new TrackingRepository();
+    this.repo = new PrismaTrackingRepository();
   }
 
   static getInstance(): TrackingService {
@@ -17,37 +16,18 @@ export class TrackingService {
     return TrackingService.instance;
   }
 
-  initTracking(params: InitTrackingDto): TrackingRecord {
-    const now = new Date();
-    const initialStatus: NotificationStatus = params.success ? 'sent' : 'failed';
-    const record: TrackingRecord = {
-      id: uuidv4(),
-      notificationId: params.notificationId,
-      channel: params.channel,
-      provider: params.provider,
-      providerMessageId: params.providerMessageId,
-      recipient: params.recipient,
-      attempts: params.attempts,
-      status: initialStatus,
-      createdAt: now,
-      updatedAt: now,
-      statusHistory: [
-        { status: 'pending', timestamp: now },
-        { status: initialStatus, timestamp: now, reason: params.error },
-      ],
-    };
-    this.repo.save(record);
-    return record;
+  async initTracking(params: InitTrackingDto): Promise<TrackingRecord> {
+    return await this.repo.save(params);
   }
 
-  handleWebhookEvent(providerMessageId: string, rawStatus: string, reason?: string): void {
-    const record = this.repo.findByProviderMessageId(providerMessageId);
+  async handleWebhookEvent(providerMessageId: string, rawStatus: string, reason?: string): Promise<void> {
+    const record = await this.repo.findByProviderMessageId(providerMessageId);
     if (!record) {
       console.warn(`[Tracking] No record found for providerMessageId: ${providerMessageId}`);
       return;
     }
     const status = this.normalizeStatus(rawStatus);
-    this.repo.updateStatus(record.notificationId, {
+    await this.repo.updateStatus(record.notificationId, {
       status,
       timestamp: new Date(),
       reason,
@@ -55,28 +35,32 @@ export class TrackingService {
     console.log(`[Tracking] ${record.notificationId} → ${status}`);
   }
 
-  getStatus(notificationId: string): TrackingRecord | undefined {
-    return this.repo.findByNotificationId(notificationId);
+  async getStatus(notificationId: string): Promise<TrackingRecord | undefined> {
+    return await this.repo.findByNotificationId(notificationId);
+  }
+
+  async getStatusByProviderMessageId(providerMessageId: string): Promise<TrackingRecord | undefined> {
+    return await this.repo.findByProviderMessageId(providerMessageId);
   }
 
   private normalizeStatus(raw: string): NotificationStatus {
-    const map: Record<string, NotificationStatus> = {
-      // Amazon SES
-      'Delivery':    'delivered',
-      'Bounce':      'failed',
-      'Complaint':   'failed',
-      // SendGrid
-      'delivered':   'delivered',
-      'bounce':      'failed',
-      'blocked':     'failed',
-      'dropped':     'failed',
-      // Twilio
-      'failed':      'failed',
-      'undelivered': 'failed',
-      'sent':        'sent',
-      // Vonage
-      'rejected':    'failed',
-    };
-    return map[raw] ?? 'sent';
-  }
+  const map: Record<string, NotificationStatus> = {
+    // Amazon SES
+    'Delivery':    'delivered',
+    'Bounce':      'failed',
+    'Complaint':   'failed',
+    // SendGrid
+    'delivered':   'delivered',
+    'bounce':      'failed',
+    'blocked':     'failed',
+    'dropped':     'failed',
+    // Twilio
+    'failed':      'failed',
+    'undelivered': 'failed',
+    'sent':        'sent',
+    // Vonage
+    'rejected':    'failed',
+  };
+  return map[raw] ?? 'pending';
+}
 }

@@ -38,7 +38,7 @@ export class NotificationsService {
       });
 
       if (resultado.success) {
-        this.trackingService.initTracking({
+        await this.trackingService.initTracking({
           notificationId,
           channel: 'email',
           provider: resultado.provider,
@@ -48,13 +48,11 @@ export class NotificationsService {
           success: true,
           error: resultado.error,
         });
-        // Avisa al Grupo 9
         AnalyticsService.notificacionEnviada(notificationId, 'email', resultado.attempts);
         return { notificationId, fallback_activado: false, ...resultado };
       }
 
       console.warn('[NotificationsService] Email falló, activando fallback a SMS');
-      // Avisa al Grupo 9 que se activó fallback
       AnalyticsService.fallbackActivado(notificationId, 'sms');
 
       const resultadoSMS = await this.smsChannel.send({
@@ -62,7 +60,7 @@ export class NotificationsService {
         message: dto.body.sms!,
       });
 
-      this.trackingService.initTracking({
+      await this.trackingService.initTracking({
         notificationId,
         channel: 'sms',
         provider: resultadoSMS.provider,
@@ -88,7 +86,7 @@ export class NotificationsService {
         message: dto.body.sms!,
       });
 
-      this.trackingService.initTracking({
+      await this.trackingService.initTracking({
         notificationId,
         channel: 'sms',
         provider: resultado.provider,
@@ -116,7 +114,7 @@ export class NotificationsService {
       });
 
       if (resultado.success) {
-        this.trackingService.initTracking({
+        await this.trackingService.initTracking({
           notificationId,
           channel: 'push',
           provider: resultado.provider,
@@ -139,7 +137,7 @@ export class NotificationsService {
         html: dto.body.email!,
       });
 
-      this.trackingService.initTracking({
+      await this.trackingService.initTracking({
         notificationId,
         channel: 'email',
         provider: resultadoEmail.provider,
