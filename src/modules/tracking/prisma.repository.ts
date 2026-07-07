@@ -51,20 +51,23 @@ export class PrismaTrackingRepository {
   }
 
   async updateStatus(notificationId: string, event: StatusEvent): Promise<TrackingRecord | undefined> {
-    const existing = await prisma.notification.findUnique({
-      where: { notificationId }
-    })
-    if (!existing) return undefined
-    const statusHistory = [...(existing.statusHistory as any[]), event]
-    const record = await prisma.notification.update({
-      where: { notificationId },
-      data: {
-        status: event.status,
-        statusHistory: statusHistory as any,
-      }
-    })
-    return this.toTrackingRecord(record)
-  }
+  const existing = await prisma.notification.findUnique({
+    where: { notificationId }
+  })
+  if (!existing) return undefined
+  
+  const statusHistory = [...(existing.statusHistory as any[]), event]
+  
+  const record = await prisma.notification.update({
+    where: { notificationId },
+    data: {
+      status: event.status,  // esto debería actualizar el status
+      updatedAt: new Date(),
+      statusHistory: statusHistory as any,
+    }
+  })
+  return this.toTrackingRecord(record)
+}
 
   private toTrackingRecord(record: any): TrackingRecord {
     return {
