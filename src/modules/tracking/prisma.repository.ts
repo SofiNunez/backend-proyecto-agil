@@ -61,7 +61,7 @@ export class PrismaTrackingRepository {
   const record = await prisma.notification.update({
     where: { notificationId },
     data: {
-      status: event.status,  // esto debería actualizar el status
+      status: event.status,  
       updatedAt: new Date(),
       statusHistory: statusHistory as any,
     }
