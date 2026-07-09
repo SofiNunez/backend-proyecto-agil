@@ -1,5 +1,5 @@
 export interface SendNotificationDto {
-  channel: 'email' | 'sms' | 'push';
+  channel: 'email' | 'sms' | 'push' | 'all';
   recipient: {
     email?: string;
     telefono?: string;

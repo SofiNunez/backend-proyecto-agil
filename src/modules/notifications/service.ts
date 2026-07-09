@@ -157,6 +157,53 @@ export class NotificationsService {
       return { notificationId, fallback_activado: true, ...resultadoEmail };
     }
 
-    throw new Error(`Canal de notificación desconocido: ${dto.channel}`);
+
+    if (dto.channel === 'all') {
+  const [resultadoEmail, resultadoSMS] = await Promise.all([
+    this.emailChannel.send({
+      to: dto.recipient.email!,
+      subject: dto.subject ?? '',
+      html: dto.body.email!,
+    }),
+    this.smsChannel.send({
+      to: dto.recipient.telefono!,
+      message: dto.body.sms!,
+    })
+  ])
+
+  await Promise.all([
+    this.trackingService.initTracking({
+      notificationId,
+      channel: 'email',
+      provider: resultadoEmail.provider,
+      providerMessageId: resultadoEmail.messageId,
+      recipient: dto.recipient.email!,
+      attempts: resultadoEmail.attempts,
+      success: resultadoEmail.success,
+      error: resultadoEmail.error,
+    }),
+    this.trackingService.initTracking({
+      notificationId: notificationId + '_sms',
+      channel: 'sms',
+      provider: resultadoSMS.provider,
+      providerMessageId: resultadoSMS.messageId,
+      recipient: dto.recipient.telefono!,
+      attempts: resultadoSMS.attempts,
+      success: resultadoSMS.success,
+      error: resultadoSMS.error,
+    })
+  ])
+
+  AnalyticsService.notificacionEnviada(notificationId, 'all', resultadoEmail.attempts + resultadoSMS.attempts)
+
+  return {
+    notificationId,
+    fallback_activado: false,
+    email: resultadoEmail,
+    sms: resultadoSMS
+  }
+}
+
+throw new Error(`Canal de notificación desconocido: ${dto.channel}`);
   }
 }
